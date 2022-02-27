@@ -1,19 +1,19 @@
 #include <Arduino.h>
 
 #include <AccelStepper.h>
-
 #include <WiFi.h>
 #include <PubSubClient.h>
+#include <ArduinoJson.h>
 
 WiFiClient espClient;
 PubSubClient client(espClient);
 
-const char* ssid = "Sorry?"; // Enter your WiFi name
-const char* password =  "watzeije?"; // Enter WiFi password
-const char* mqtt_server = "192.168.2.22";
+const char* ssid = "..."; // Enter your WiFi name
+const char* password =  "..."; // Enter WiFi password
+const char* mqtt_server = "...";
 #define mqtt_port 1883
-#define MQTT_USER "openhabian"
-#define MQTT_PASSWORD "openhabian"
+#define MQTT_USER "..."
+#define MQTT_PASSWORD "..."
 #define DELAY_AFTER_SEND 100
 
 #define MSG_BUFFER_SIZE  (1024)
@@ -23,7 +23,6 @@ char heapMSG[MSG_BUFFER_SIZE];
 unsigned long nextPublishInterval = 300000;
 unsigned long nextPublish = 0;
 
-#include <ArduinoJson.h>
 
 const int MOTOR_1_STEP = 22;
 const int MOTOR_1_DIR = 23;
@@ -187,12 +186,10 @@ void callback(const char topic[], byte* payload, unsigned int length) {
   if (strcmp(topicCopy, subscribe_path_rolgordijn_rechts) == 0) {
     flag_update_step_rechts = true;
     new_step_rechts = doc["percentage"];
-    //runSingleMotor(&rolgordijn_rechts, doc["percentage"], publish_path_rolgordijn_rechts, total_steps_rolgordijn_rechts, MOTOR_1_ENABLE);
   }
   else if (strcmp(topicCopy, subscribe_path_rolgordijn_links) == 0) {
     flag_update_step_links = true;
     new_step_links = doc["percentage"];
-    //runSingleMotor(&rolgordijn_links, doc["percentage"], publish_path_rolgordijn_links, total_steps_rolgordijn_links, MOTOR_2_ENABLE);
   }
   else if (strcmp(topicCopy, subscribe_path_rolgordijnen) == 0) {
     flag_update_step_alles = true;
@@ -202,22 +199,18 @@ void callback(const char topic[], byte* payload, unsigned int length) {
   else if (strcmp(topicCopy, subscribe_path_rolgordijn_rechts_max) == 0) {
     flag_update_max_step_rechts = true;
     new_max_step_rechts = doc["max_step"];
-//    updateMaxStep(&total_steps_rolgordijn_rechts, doc["max_step"], publish_path_rolgordijn_rechts_max);
   }
   else if (strcmp(topicCopy, subscribe_path_rolgordijn_links_max) == 0) {
     flag_update_max_step_links = true;
     new_max_step_links = doc["max_step"];
-//    updateMaxStep(&total_steps_rolgordijn_links, doc["max_step"], publish_path_rolgordijn_links_max);
   }
   else if (strcmp(topicCopy, subscribe_path_rolgordijn_rechts_speed) == 0) {
     flag_update_speed_rechts = true;
     new_speed_rechts = doc["speed"];
-//    updateMaxSpeed(&rolgordijn_rechts, doc["speed"], publish_path_rolgordijn_rechts_speed);
   }
   else if (strcmp(topicCopy, subscribe_path_rolgordijn_links_speed) == 0) {
     flag_update_speed_links = true;
     new_speed_links = doc["speed"];
-//    updateMaxSpeed(&rolgordijn_links, doc["speed"], publish_path_rolgordijn_links_speed);
   }
   else if (strcmp(topicCopy, subscribe_path_rolgordijn_rechts_accel) == 0) {
     flag_update_accel_rechts = true;
