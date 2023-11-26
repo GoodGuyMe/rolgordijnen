@@ -1,0 +1,63 @@
+#include <Arduino.h>
+
+#include <AccelStepper.h>
+#include <Preferences.h>
+
+#include "window.h"
+#include "mqtt.h"
+#include "motor.h"
+
+void updateMaxStep(float* item, long max_step, const char* publish_path) {
+  snprintf (msg, MSG_BUFFER_SIZE, "{\"percentage\": %u}", (long)max_step);
+  client.publish(publish_path, msg);
+}
+
+void updateMaxSpeed(AccelStepper* motor, long max_speed, const char* publish_path) {
+  snprintf (msg, MSG_BUFFER_SIZE, "{\"speed\": %u}", (long)max_speed);
+  client.publish(publish_path, msg);
+}
+
+void updateAccel(AccelStepper* motor, long accel, const char* publish_path) {
+  snprintf (msg, MSG_BUFFER_SIZE, "{\"accel\": %u}", (long)accel);
+  client.publish(publish_path, msg);
+}
+
+void setup() {
+  Serial.begin(115200);
+
+  delay(10);
+  pinMode(MOTOR_1_ENABLE, OUTPUT);
+  pinMode(MOTOR_2_ENABLE, OUTPUT);
+
+  delay(1000);
+
+  digitalWrite(MOTOR_1_ENABLE, HIGH);
+  digitalWrite(MOTOR_2_ENABLE, HIGH);
+
+  // Load the saved state the table was in
+  preferences.begin("rolgordijnen", false);
+  loadSave();
+
+  Serial.setTimeout(500);// Set time out for
+
+  setup_mqtt();
+
+  setup_check_window();
+
+  setupMotor(&rolgordijn_rechts, new_speed_links, new_accel_rechts, new_step_alles);
+  setupMotor(&rolgordijn_links, new_speed_rechts, new_accel_links, new_step_alles);
+
+  rolgordijn_rechts.setPinsInverted(true, false, false);
+  rolgordijn_links.setPinsInverted(true, false, false);
+
+  client.publish(publish_path_rolgordijnen_on, "{\"state\": \"ON\"}");
+}
+
+void loop() {
+  checkMQTTMessage();
+  runMotors();
+  if (flag_window) {
+    send_window_message();
+    flag_window = false;
+  }
+}

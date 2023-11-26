@@ -1,50 +1,46 @@
-char* begin_path = "esp32/gordijnen/voor";
+#pragma once
+
+#include <Arduino.h>
+#include <ArduinoJson.h>
+#include "secrets.h"
+#include <WiFi.h>
+#include <PubSubClient.h>
+
+WiFiClient espClient;
+PubSubClient client(espClient);
+
+#define DELAY_AFTER_SEND 100
 
 #define MSG_BUFFER_SIZE  (1024)
 char msg[MSG_BUFFER_SIZE];
 char heapMSG[MSG_BUFFER_SIZE];
 
-char* publish_path_rolgordijn_rechts;
-char* publish_path_rolgordijn_links;
-char* publish_path_rolgordijnen;
+const char* publish_path_rolgordijnen  = "esp32/gordijnen/voor";
 
-char* subscribe_path_rolgordijn_rechts;
-char* subscribe_path_rolgordijn_links;
-char* subscribe_path_rolgordijnen;
+const char* subsribe_path = "/set";
+      char* subscribe_path_rolgordijnen;
+      char* subscribe_path_rolgordijn_rechts;
+      char* subscribe_path_rolgordijn_links;
 
-char* publish_path_rolgordijn_rechts_max;
-char* publish_path_rolgordijn_links_max;
-char* subscribe_path_rolgordijn_rechts_max;
-char* subscribe_path_rolgordijn_links_max;
+const char* max_step_path = "/max_steps/set";
+      char* subscribe_path_rolgordijn_rechts_max;
+      char* subscribe_path_rolgordijn_links_max;
 
-char* publish_path_rolgordijn_rechts_speed;
-char* publish_path_rolgordijn_links_speed;
-char* subscribe_path_rolgordijn_rechts_speed;
-char* subscribe_path_rolgordijn_links_speed;
+const char* speed_path = "/speed/set";
+      char* subscribe_path_rolgordijn_rechts_speed;
+      char* subscribe_path_rolgordijn_links_speed;
 
-char* publish_path_rolgordijn_rechts_accel;
-char* publish_path_rolgordijn_links_accel;
-char* subscribe_path_rolgordijn_rechts_accel;
-char* subscribe_path_rolgordijn_links_accel;
+const char* accel_path = "/accel/set";
+      char* subscribe_path_rolgordijn_rechts_accel;
+      char* subscribe_path_rolgordijn_links_accel;
 
-char* publish_path_gordijn_rechts;
-char* publish_path_gordijn_links;
-char* publish_path_gordijnen;
-char* subscribe_path_gordijn_rechts;
-char* subscribe_path_gordijn_links;
-char* subscribe_path_gordijnen;
+const char* stop_path = "/stop";
+      char* subscribe_path_rolgordijn_stop;
 
-char* publish_path_gordijn_rechts_max;
-char* publish_path_gordijn_links_max;
-char* subscribe_path_gordijn_rechts_max;
-char* subscribe_path_gordijn_links_max;
+char* createSubscribePath(const char* side, const char* extra_path);
+void setup_mqtt();
+void checkMQTTMessage();
+void sendUpdateMessage();
 
-char* publish_path_gordijn_rechts_speed;
-char* publish_path_gordijn_links_speed;
-char* subscribe_path_gordijn_rechts_speed;
-char* subscribe_path_gordijn_links_speed;
-
-char* publish_path_gordijn_rechts_accel;
-char* publish_path_gordijn_links_accel;
-char* subscribe_path_gordijn_rechts_accel;
-char* subscribe_path_gordijn_links_accel;
+boolean flag_update = true;
+boolean flag_step_update = false;
