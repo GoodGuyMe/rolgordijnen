@@ -18,8 +18,10 @@ void IRAM_ATTR window_isr() {
 boolean setup_check_window() {
   pinMode(window_pin, INPUT_PULLUP);
   attachInterrupt(window_pin, window_isr, CHANGE);
-
-  publish_path_rolgordijnen_window = createSubscribePath("", window_path);
+  
+  publish_path_rolgordijnen_window = (char*)malloc(96 * sizeof(char));
+  strcpy(publish_path_rolgordijnen_window, publish_path_rolgordijnen);
+  strcat(publish_path_rolgordijnen_window, window_path);
 }
 
 void send_window_message() {
