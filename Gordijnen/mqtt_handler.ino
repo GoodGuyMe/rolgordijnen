@@ -30,6 +30,8 @@ void MqttPath::add_mqtt_path(char* path, Motor* motor_obj, void (Motor::*callbac
 
 void MqttPath::subscribe() {
   client.subscribe(_path);
+  Serial.print("Subscribed to:");
+  Serial.println(_path);
   if (_next == NULL) {
     return;
   }

@@ -16,7 +16,7 @@ PubSubClient client(espClient);
 char msg[MSG_BUFFER_SIZE];
 char heapMSG[MSG_BUFFER_SIZE];
 
-const char* publish_path_rolgordijnen  = "esp32/gordijnen/test";
+const char* publish_path_rolgordijnen  = "esp32/gordijnen/voor";
 
 void setup_mqtt();
 void checkMQTTMessage();

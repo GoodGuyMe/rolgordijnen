@@ -40,11 +40,12 @@ Motor::Motor(const char* mqtt_path, const int step_pin, const int dir_pin, const
   _stepper->setAcceleration(acceleration);
   _stepper->setCurrentPosition(initial_pos * _max_steps);
 
-//  paths = /set, /max_steps/set, /speed/set, /accel/set, /stop
+//  paths = /set, /max_steps/set, /speed/set, /accel/set, /step/set, /stop
   motor_mqtt_helper(mqtt_path, "/set", this, &Motor::set_pos);
   motor_mqtt_helper(mqtt_path, "/max_steps/set", this, &Motor::set_max_step);
   motor_mqtt_helper(mqtt_path, "/speed/set", this, &Motor::set_max_speed);
   motor_mqtt_helper(mqtt_path, "/accel/set", this, &Motor::set_acceleration);
+  motor_mqtt_helper(mqtt_path, "/step/set", this, &Motor::set_current_step);
   motor_mqtt_helper(mqtt_path, "/stop", this, &Motor::set_stop);
 }
 
@@ -55,6 +56,10 @@ boolean Motor::set_enable_pin(int level) {
   }
   digitalWrite(_enable_pin, HIGH);
   return false;
+}
+
+void Motor::force_enable() {
+  digitalWrite(_enable_pin, LOW);
 }
 
 void Motor::save(boolean only_step) {
@@ -97,6 +102,12 @@ void Motor::set_max_speed(const JsonDocument& local_doc) {
 
 void Motor::set_acceleration(const JsonDocument& local_doc) {
   _stepper->setAcceleration(local_doc["accel"]);
+}
+
+void Motor::set_current_step(const JsonDocument& local_doc) {
+  flag_step_update = true;
+  int percentage = local_doc["percentage"];
+  _stepper->setCurrentPosition(percentage * _max_steps);
 }
 
 void Motor::set_stop(const JsonDocument& local_doc) {
@@ -145,6 +156,9 @@ void Motors::run() {
         need_running = need_running || _motors[i]->set_enable_pin(LOW);
       }
       if (need_running) {
+        for (int i = 0; i < _size; i++) {
+          _motors[i]->force_enable();
+        }
         _start_wait = millis();
         _state = WAITING_ENABLE;
       }
@@ -164,9 +178,11 @@ void Motors::run() {
       if (!running) {
         _start_wait = millis();
         _state = WAITING_DISABLE;
+        flag_step_update = true;
         flag_update = true;
       }
       break;
+      
     }
     case WAITING_DISABLE: {
       if (millis() - _start_wait > 5) {

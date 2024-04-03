@@ -22,14 +22,14 @@ void setup() {
 
   char left_path[96];
   strcpy(left_path, publish_path_rolgordijnen);
-  strcat(left_path, "/left");
-  Motor* rol_left = new Motor(left_path, MOTOR_1_STEP, MOTOR_1_DIR, MOTOR_1_ENABLE, "left", true);
+  strcat(left_path, "/links");
+  Motor* rol_left = new Motor(left_path, MOTOR_1_STEP, MOTOR_1_DIR, MOTOR_1_ENABLE, "links", false);
   motors.addMotor(rol_left);
 
   char right_path[96];
   strcpy(right_path, publish_path_rolgordijnen);
-  strcat(right_path, "/right");
-  Motor* rol_right = new Motor(right_path, MOTOR_2_STEP, MOTOR_2_DIR, MOTOR_2_ENABLE, "right", true);
+  strcat(right_path, "/rechts");
+  Motor* rol_right = new Motor(right_path, MOTOR_2_STEP, MOTOR_2_DIR, MOTOR_2_ENABLE, "rechts", true);
   motors.addMotor(rol_right);
 
   char set_path[96];
@@ -37,6 +37,12 @@ void setup() {
   strcat(set_path, "/set");
   first_mqtt->add_mqtt_path(set_path, rol_left,  &Motor::set_pos);
   first_mqtt->add_mqtt_path(set_path, rol_right, &Motor::set_pos);
+
+  char stop_path[96];
+  strcpy(stop_path, publish_path_rolgordijnen);
+  strcat(stop_path, "/stop");
+  first_mqtt->add_mqtt_path(stop_path, rol_left,  &Motor::set_stop);
+  first_mqtt->add_mqtt_path(stop_path, rol_right, &Motor::set_stop);
   
   setup_mqtt();
 }
