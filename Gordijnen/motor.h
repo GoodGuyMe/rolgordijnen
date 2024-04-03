@@ -16,6 +16,10 @@ const int MOTOR_2_STEP = 25;
 const int MOTOR_2_DIR = 26;
 const int MOTOR_2_ENABLE = 27;
 
+const int MOTOR_3_STEP = 15;
+const int MOTOR_3_DIR = 2;
+const int MOTOR_3_ENABLE = 4;
+
 class Motor {
   public:
     Motor(const char* mqtt_path, const int step_pin, const int dir_pin, const int enable_pin, String id, boolean inverted);
