@@ -32,6 +32,7 @@ class Motor {
     void set_stop(const JsonDocument& local_doc);
   private:
     void set_max_step(const JsonDocument& local_doc);
+    void set_close_time(const JsonDocument& local_doc);
     void set_max_speed(const JsonDocument& local_doc);
     void set_acceleration(const JsonDocument& local_doc);
     void set_current_step(const JsonDocument& local_doc);

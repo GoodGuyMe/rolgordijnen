@@ -43,6 +43,7 @@ Motor::Motor(const char* mqtt_path, const int step_pin, const int dir_pin, const
 //  paths = /set, /max_steps/set, /speed/set, /accel/set, /step/set, /stop
   motor_mqtt_helper(mqtt_path, "/set", this, &Motor::set_pos);
   motor_mqtt_helper(mqtt_path, "/max_steps/set", this, &Motor::set_max_step);
+  motor_mqtt_helper(mqtt_path, "/time/set", this, &Motor::set_close_time);
   motor_mqtt_helper(mqtt_path, "/speed/set", this, &Motor::set_max_speed);
   motor_mqtt_helper(mqtt_path, "/accel/set", this, &Motor::set_acceleration);
   motor_mqtt_helper(mqtt_path, "/step/set", this, &Motor::set_current_step);
@@ -100,6 +101,10 @@ void Motor::set_max_speed(const JsonDocument& local_doc) {
   _stepper->setMaxSpeed(local_doc["speed"]);
 }
 
+void Motor::set_close_time(const JsonDocument& local_doc) {
+  _stepper->setMaxSpeed(((float)_max_steps) * 100.0 / ((float)local_doc["time"]));
+}
+
 void Motor::set_acceleration(const JsonDocument& local_doc) {
   _stepper->setAcceleration(local_doc["accel"]);
 }
@@ -124,6 +129,7 @@ void Motor::send_mqtt(JsonDocument& local_doc) {
   json["speed"] = _stepper->maxSpeed();
   json["accel"] = _stepper->acceleration();
   json["max_step"] = (int)(_max_steps * 100.0);
+  json["time"] = (int)(_max_steps * 100.0 / _stepper->maxSpeed());
 }
 
 Motors::Motors(int initial_size) {
@@ -194,7 +200,7 @@ void Motors::run() {
 }
 
 void Motors::sendMQTT() {
-  StaticJsonDocument<192> doc;
+  StaticJsonDocument<256> doc;
 
   for (int i = 0; i < _size; i++) {
     _motors[i]->send_mqtt(doc);
